@@ -26,15 +26,18 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build
-        run: ./gradlew build remapJar
+      - name: Build Fabric
+        run: ./gradlew :fabric:build :fabric:remapJar
         env:
           CURSEFORGE_API_KEY: dummy
           MODRINTH_TOKEN: dummy
           MOD_UPDATE_API_KEY: dummy
 
-      - name: Upload JAR
+      - name: Debug JARs
+        run: find fabric/build/libs -name "*.jar"
+
+      - name: Upload Fabric JAR
         uses: actions/upload-artifact@v4
         with:
-          name: mod-jar
-          path: build/libs/*.jar
+          name: fabric-mod
+          path: fabric/build/libs/*.jar
