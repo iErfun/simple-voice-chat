@@ -17,11 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -32,9 +32,6 @@ jobs:
           CURSEFORGE_API_KEY: dummy
           MODRINTH_TOKEN: dummy
           MOD_UPDATE_API_KEY: dummy
-
-      - name: List files (debug)
-        run: ls -R build
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
