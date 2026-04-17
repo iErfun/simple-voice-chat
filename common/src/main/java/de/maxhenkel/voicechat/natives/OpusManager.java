@@ -16,7 +16,7 @@ public class OpusManager extends NativeValidator {
 
     @Override
     protected void runValidation() throws Throwable {
-        NativeOpusEncoderImpl encoder = new NativeOpusEncoderImpl(AudioUtils.SAMPLE_RATE, 2, Application.VOIP);
+        NativeOpusEncoderImpl encoder = new NativeOpusEncoderImpl(AudioUtils.SAMPLE_RATE, 1, Application.AUDIO);
         encoder.setMaxPayloadSize(AudioUtils.DEFAULT_MAX_PAYLOAD_SIZE);
         byte[] encoded = encoder.encode(new short[AudioUtils.FRAME_SIZE]);
         encoder.resetState();
@@ -51,7 +51,7 @@ public class OpusManager extends NativeValidator {
 
         if (instance.canUse()) {
             try {
-                NativeOpusEncoderImpl encoder = new NativeOpusEncoderImpl(AudioUtils.SAMPLE_RATE, 2, application);
+                NativeOpusEncoderImpl encoder = new NativeOpusEncoderImpl(AudioUtils.SAMPLE_RATE, 1, application);
                 encoder.setMaxPayloadSize(mtuSize);
                 return encoder;
             } catch (Throwable e) {
