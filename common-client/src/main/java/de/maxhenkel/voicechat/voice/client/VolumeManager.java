@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class VolumeManager {
 
     public static final double MIN_GAIN = -40D;
-    public static final double MAX_GAIN = 24D;
+    public static final double MAX_GAIN = 200D;
     private static final short MAX_AMPLIFICATION = Short.MAX_VALUE - 1;
 
     private final double[] maxVolumes;
@@ -56,24 +56,19 @@ public class VolumeManager {
     }
 
     private static double getMaximumMultiplier(short[] audio, double multiplier) {
-        short max = 0;
 
+        short max = 0;
         for (short value : audio) {
-            short abs;
-            if (value <= Short.MIN_VALUE) {
-                abs = (short) Math.abs(value + 1);
-            } else {
-                abs = (short) Math.abs(value);
-            }
+            short abs = (short) Math.abs(value);
             if (abs > max) {
                 max = abs;
             }
         }
-
         if (max == 0) {
             return multiplier;
         }
-        return Math.min(multiplier, (double) MAX_AMPLIFICATION / (double) max);
+
+        return multiplier;
     }
 
 }
