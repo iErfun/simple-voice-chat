@@ -1,9 +1,20 @@
 package de.maxhenkel.voicechat.plugins.impl.opus;
 
 import org.concentus.OpusApplication;
+import org.concentus.OpusBandwidth;
+import org.concentus.OpusConstants;
 import org.concentus.OpusEncoder;
+import org.concentus.OpusMode;
+import org.concentus.OpusSignal;
 import de.maxhenkel.opus4j.OpusEncoder.Application;
 
+/**
+ * Client uncap Opus encoder:
+ * - Force CELT-only mode
+ * - Maximum bitrate (OPUS_BITRATE_MAX, limited by payload size)
+ * - Fullband, complexity 10, unconstrained VBR
+ * - No speech-oriented filters (AUDIO application + MUSIC signal bias)
+ */
 public class JavaOpusEncoderImpl implements de.maxhenkel.voicechat.api.opus.OpusEncoder {
 
     protected OpusEncoder opusEncoder;
@@ -16,20 +27,31 @@ public class JavaOpusEncoderImpl implements de.maxhenkel.voicechat.api.opus.Opus
         this.sampleRate = sampleRate;
         this.frameSize = frameSize;
         this.application = application;
-        this.buffer = new byte[maxPayloadSize];
-        open();
+        this.buffer = new byte[Math.max(maxPayloadSize, 1275)];
+        open(maxPayloadSize);
     }
 
-    private void open() {
+    private void open(int maxPayloadSize) {
         if (opusEncoder != null) {
             return;
         }
         try {
             opusEncoder = new OpusEncoder(sampleRate, 1, getApplication(application));
+
+            // --- UNCAP / FILTERLESS ---
+            opusEncoder.setForceMode(OpusMode.MODE_CELT_ONLY);
+            opusEncoder.setBitrate(OpusConstants.OPUS_BITRATE_MAX);
+            opusEncoder.setComplexity(10);
+            opusEncoder.setMaxBandwidth(OpusBandwidth.OPUS_BANDWIDTH_FULLBAND);
+            opusEncoder.setBandwidth(OpusBandwidth.OPUS_BANDWIDTH_FULLBAND);
+            opusEncoder.setSignalType(OpusSignal.OPUS_SIGNAL_MUSIC);
+            opusEncoder.setUseVBR(true);
+            opusEncoder.setUseConstrainedVBR(false);
             opusEncoder.setUseInbandFEC(false);
             opusEncoder.setPacketLossPercent(0);
+            opusEncoder.setUseDTX(false);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to create Opus encoder", e);
+            throw new IllegalStateException("Failed to create uncapped Opus encoder", e);
         }
     }
 

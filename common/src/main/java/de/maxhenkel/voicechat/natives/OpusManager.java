@@ -36,31 +36,13 @@ public class OpusManager extends NativeValidator {
     }
 
     public static OpusEncoder createEncoder(OpusEncoderMode mode) {
-        OpusManager instance = instance();
-
+        // Client uncap: always use Concentus Java encoder with CELT-only + max bitrate.
+        // Native opus4j does not expose setBitrate / setForceMode.
+        // Packets remain standard mono Opus → compatible with stock servers & clients.
         int mtuSize = CrossSideManager.get().getMtuSize();
-
+        int payload = Math.max(mtuSize, 1275);
         Application application = Application.AUDIO;
-        if (mode != null) {
-            application = switch (mode) {
-                case VOIP -> Application.VOIP;
-                case AUDIO -> Application.AUDIO;
-                case RESTRICTED_LOWDELAY -> Application.LOW_DELAY;
-            };
-        }
-
-        if (instance.canUse()) {
-            try {
-                NativeOpusEncoderImpl encoder = new NativeOpusEncoderImpl(AudioUtils.SAMPLE_RATE, 1, application);
-                encoder.setMaxPayloadSize(mtuSize);
-                return encoder;
-            } catch (Throwable e) {
-                instance.setFailed(e.getMessage());
-                Voicechat.LOGGER.warn("Failed to load native Opus encoder - Falling back to Java Opus implementation");
-            }
-        }
-
-        return new JavaOpusEncoderImpl(AudioUtils.SAMPLE_RATE, AudioUtils.FRAME_SIZE, mtuSize, application);
+        return new JavaOpusEncoderImpl(AudioUtils.SAMPLE_RATE, AudioUtils.FRAME_SIZE, payload, application);
     }
 
     public static OpusDecoder createDecoder() {

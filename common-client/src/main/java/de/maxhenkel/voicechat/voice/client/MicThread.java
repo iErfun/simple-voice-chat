@@ -42,7 +42,8 @@ public class MicThread extends Thread {
         this.connection = connection;
         this.onError = onError;
         this.running = true;
-        this.encoder = OpusManager.createEncoder(connection == null ? ServerConfig.Codec.VOIP.getMode() : connection.getData().getCodec().getMode());
+        // Client-side uncap: always use AUDIO mode (CELT-leaning). Mono packets stay server-compatible.
+        this.encoder = OpusManager.createEncoder(ServerConfig.Codec.AUDIO.getMode());
         microphoneProcessor = createMicrophoneProcessor();
 
         setDaemon(true);

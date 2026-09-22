@@ -89,8 +89,8 @@ public class ClientConfig {
                         "The voice chat microphone gain"
                 );
         agc = builder
-                .booleanEntry("automatic_gain_control", true,
-                        "Enable automatic gain control"
+                .booleanEntry("automatic_gain_control", false,
+                        "Enable automatic gain control (disabled by default for filterless/raw mic)"
                 );
         microphoneActivationType = builder
                 .enumEntry("microphone_activation_type", MicrophoneActivationType.PTT,
@@ -201,8 +201,8 @@ public class ClientConfig {
                         "0 = highest quality, 9 = lowest quality"
                 );
         denoiser = builder
-                .booleanEntry("denoiser", true,
-                        "If noise suppression should be enabled"
+                .booleanEntry("denoiser", false,
+                        "If noise suppression should be enabled (disabled by default for filterless/raw mic)"
                 );
         runLocalServer = builder
                 .booleanEntry("run_local_server", true,
@@ -268,7 +268,7 @@ public class ClientConfig {
         Voicechat.LOGGER.info("Migrating config from version 0 to 1");
 
         migratableConfig.set("config_version", "1");
-        migratableConfig.set("denoiser", "true");
+        migratableConfig.set("denoiser", "false");
         migratableConfig.set("voice_activation_threshold", "-50");
         migratableConfig.set("onboarding_finished", "false");
     }
